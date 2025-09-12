@@ -11,18 +11,23 @@ class PortfolioManagerAgent:
                 writer = csv.writer(file)
                 writer.writerow(['Date', 'Symbol', 'Action', 'Quantity', 'Price', 'Reasoning'])
 
-    def execute_trades(self, risk_assessment, trade_date):
-        # Example: Simulate a trade for demonstration
-        trade = {
-            'Date': trade_date.strftime('%Y-%m-%d'),
-            'Symbol': 'AMZN',
-            'Action': 'BUY',
-            'Quantity': 10,
-            'Price': 100.0,
-            'Reasoning': str(risk_assessment)
-        }
-        self.log_trade(trade)
-        return {"trades": [trade]}
+    def execute_trades(self, risk_assessment, trade_date, trade_price=None):
+        # Expect risk_assessment to include the trading signals
+        trades = []
+        signals = risk_assessment.get('signals', [])
+        for signal in signals:
+            price = trade_price if trade_price is not None else signal.get('price', 100.0)
+            trade = {
+                'Date': trade_date.strftime('%Y-%m-%d'),
+                'Symbol': signal.get('symbol', 'AMZN'),
+                'Action': signal.get('action', 'BUY'),
+                'Quantity': signal.get('quantity', 10),
+                'Price': price,
+                'Reasoning': str(risk_assessment)
+            }
+            self.log_trade(trade)
+            trades.append(trade)
+        return {"trades": trades}
 
     def log_trade(self, trade):
         with open(self.trades_log_path, mode='a', newline='') as file:

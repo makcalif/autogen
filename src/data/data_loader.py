@@ -14,7 +14,6 @@ class DataLoader:
         return self.data
 
     def get_weekly_data(self, start_date, end_date):
-        print ("Getting data from {} to {}".format(start_date, end_date))
         if self.data is None:
             self.load_data()
         # Failsafe: always ensure 'Date' is datetime before filtering
