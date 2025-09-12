@@ -45,7 +45,7 @@ class DummyLLM:
     def generate_signals(self, analysis_result):
         # Use moving average crossover signal
         insights = analysis_result.get("insights", {})
-        signal = insights.get("signal", 0) if isinstance(insights, dict) else 0
+        signal = analysis_result.get("signal", 0) if isinstance(analysis_result, dict) else 0
         if signal == 1:
             return {"signals": [{"action": "BUY", "symbol": "AMZN", "quantity": 10}]}
         elif signal == -1:

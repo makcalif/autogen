@@ -1,20 +1,21 @@
 from src.data.data_loader import DataLoader
-from src.agents.data_analyst import DataAnalystAgent
+from src.agents.llm_data_analyst import LLMDataAnalystAgent
 from src.agents.trading_strategy import TradingStrategyAgent
 from src.agents.risk_manager import RiskManagerAgent
 from src.agents.portfolio_manager import PortfolioManagerAgent
 from src.agents.performance_monitor import PerformanceMonitorAgent
 import datetime
+import pandas as pd
 
 DATA_PATH = 'data/amzn_raw.csv'
 START_DATE = datetime.datetime(1997, 5, 16)
-END_DATE = datetime.datetime(2007, 12, 31)
+END_DATE = datetime.datetime(1998, 12, 31)
 WEEK = datetime.timedelta(days=7)
 
 def main():
     data_loader = DataLoader(DATA_PATH)
     data_loader.load_data()
-    data_analyst = DataAnalystAgent()
+    data_analyst = LLMDataAnalystAgent()
     strategy_agent = TradingStrategyAgent()
     risk_manager = RiskManagerAgent()
     portfolio_manager = PortfolioManagerAgent()
@@ -30,8 +31,17 @@ def main():
             if week_end > last_data_date:
                 week_end = last_data_date
         # Pass all data up to week_end for correct SMA calculation
-        price_history = data_loader.get_weekly_data(START_DATE, week_end)
-        analysis_result = data_analyst.analyze(price_history)
+        full_history = data_loader.get_weekly_data(START_DATE, week_end)
+        # Only pass last 26 days (or rows) up to week_end to the analyst (no future data)
+        if not full_history.empty:
+            # Ensure 'Date' is datetime
+            if not pd.api.types.is_datetime64_any_dtype(full_history['Date']):
+                full_history['Date'] = pd.to_datetime(full_history['Date'])
+            # Filter to only rows <= week_end
+            history_to_pass = full_history[full_history['Date'] <= week_end].tail(26)
+        else:
+            history_to_pass = full_history
+        analysis_result = data_analyst.analyze(history_to_pass)
         # Only proceed if analysis_result is valid
         if analysis_result.get('insights') == 'No data':
             current_date += WEEK
@@ -40,9 +50,8 @@ def main():
         risk_assessment = risk_manager.evaluate_risk(trading_signals)
         # Get the actual Adj Close price for the trade date (week_end)
         trade_price = None
-        if not price_history.empty:
-            # Find the last available price on or before week_end
-            price_row = price_history[price_history['Date'] <= week_end]
+        if not full_history.empty:
+            price_row = full_history[full_history['Date'] <= week_end]
             if not price_row.empty:
                 trade_price = price_row.iloc[-1]['Adj Close']
         trades = portfolio_manager.execute_trades(risk_assessment, trade_date=week_end, trade_price=trade_price)
