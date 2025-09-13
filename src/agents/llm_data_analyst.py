@@ -88,8 +88,8 @@ summary_14d: {json.dumps({
 })}
 instructions: {{
   "rules": {{
-    "RSI": "RSI > 70 = overbought → consider SELL; RSI < 30 = oversold → consider BUY",
-    "ROC_14": "ROC > +2% → bullish → BUY; ROC < -2% → bearish → SELL",
+    "RSI": "RSI > 85 = overbought → consider SELL; RSI < 15 = oversold → consider BUY",
+    "ROC_14": "ROC > +6% → bullish → BUY; ROC < -6% → bearish → SELL",
     "MACD": "MACD line > signal line → bullish → BUY; MACD line < signal line → bearish → SELL"
   }},
   "goal": "Using the above indicators, choose one action: BUY, SELL, or HOLD. Avoid staying neutral unless the indicators strongly conflict."

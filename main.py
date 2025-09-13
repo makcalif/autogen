@@ -9,7 +9,7 @@ import pandas as pd
 
 DATA_PATH = 'data/amzn_raw.csv'
 START_DATE = datetime.datetime(1997, 5, 16)
-END_DATE = datetime.datetime(1998, 12, 31)
+END_DATE = datetime.datetime(2007, 12, 31)
 WEEK = datetime.timedelta(days=7)
 
 def main():
