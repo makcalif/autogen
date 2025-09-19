@@ -38,7 +38,8 @@ This project is a modular multi-agent trading simulation using historical stock 
 
 ## Notes
 - The analyst agent requires at least 26 days of data for full indicator calculation.
-- All LLM responses are parsed as strict JSON for reliability.
+- All LLM responses are parsed as strict JSON for reliability. test update
 
 ## License
 MIT
+
